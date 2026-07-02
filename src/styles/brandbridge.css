@@ -1,0 +1,180 @@
+.bb-page {
+  --bg: #0a0a12;
+  --surface: rgba(255, 255, 255, 0.045);
+  --surface-strong: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.09);
+  --purple: #8b5cf6;
+  --blue: #4f8cff;
+  --text: #f2f2f7;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", sans-serif;
+  overflow-x: hidden;
+}
+
+.bb-display {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.bb-grad-text {
+  background: linear-gradient(135deg, var(--purple), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bb-glass {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.bb-glass-strong {
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.bb-btn-primary {
+  background: linear-gradient(135deg, var(--purple), var(--blue));
+  color: #fff;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.bb-btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -8px rgba(139, 92, 246, 0.55);
+}
+
+.bb-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.bb-card {
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.bb-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 16px 40px -16px rgba(139, 92, 246, 0.35);
+}
+
+.bb-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+  animation: bbFloat 9s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes bbFloat {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-22px) translateX(10px);
+  }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bb-path {
+  stroke-dasharray: 6 10;
+  animation: bbDash 2.4s linear infinite;
+}
+
+@keyframes bbDash {
+  to {
+    stroke-dashoffset: -160;
+  }
+}
+
+.bb-pulse-ring {
+  animation: bbPulseRing 2.6s ease-out infinite;
+}
+
+@keyframes bbPulseRing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 18px rgba(139, 92, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+  }
+}
+
+.bb-input {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.bb-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.bb-input:focus {
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.bb-input-error {
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+.bb-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+}
+
+.bb-divider::before,
+.bb-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-orb,
+  .bb-path,
+  .bb-pulse-ring,
+  .reveal {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

@@ -256,7 +256,13 @@ function BridgeMatch() {
 }
 
 // ---------- Data ----------
-const navLinks = ["Features", "How It Works", "Pricing", "About", "Contact"];
+const navLinks = [
+  { label: "Features", href: "#features" },
+  { label: "How It Works", href: "#how-it-works" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "About", href: "#about" },
+  { label: "Contact", href: "#contact" },
+];
 
 const features: Feature[] = [
   {
@@ -390,88 +396,6 @@ export default function BrandBridgeLanding() {
 
   return (
     <div className="bb-page min-h-screen">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
-
-        .bb-page {
-          --bg: #0a0a12;
-          --surface: rgba(255,255,255,0.045);
-          --surface-strong: rgba(255,255,255,0.08);
-          --border: rgba(255,255,255,0.09);
-          --purple: #8b5cf6;
-          --blue: #4f8cff;
-          --text: #f2f2f7;
-          background: var(--bg);
-          color: var(--text);
-          font-family: 'Inter', sans-serif;
-          overflow-x: hidden;
-        }
-        .bb-display { font-family: 'Space Grotesk', sans-serif; }
-        .bb-grad-text {
-          background: linear-gradient(135deg, var(--purple), var(--blue));
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-        }
-        .bb-glass {
-          background: var(--surface);
-          border: 1px solid var(--border);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-        }
-        .bb-glass-strong {
-          background: var(--surface-strong);
-          border: 1px solid var(--border);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-        }
-        .bb-btn-primary {
-          background: linear-gradient(135deg, var(--purple), var(--blue));
-          color: #fff;
-          transition: transform .25s ease, box-shadow .25s ease;
-        }
-        .bb-btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 30px -8px rgba(139,92,246,0.55);
-        }
-        .bb-card { transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease; }
-        .bb-card:hover {
-          transform: translateY(-4px);
-          border-color: rgba(139,92,246,0.4);
-          box-shadow: 0 16px 40px -16px rgba(139,92,246,0.35);
-        }
-        .bb-orb {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(60px);
-          opacity: 0.35;
-          animation: bbFloat 9s ease-in-out infinite;
-          pointer-events: none;
-        }
-        @keyframes bbFloat {
-          0%, 100% { transform: translateY(0) translateX(0); }
-          50% { transform: translateY(-22px) translateX(10px); }
-        }
-        .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
-        .reveal-visible { opacity: 1; transform: translateY(0); }
-        .bb-path { stroke-dasharray: 6 10; animation: bbDash 2.4s linear infinite; }
-        @keyframes bbDash { to { stroke-dashoffset: -160; } }
-        .bb-pulse-ring { animation: bbPulseRing 2.6s ease-out infinite; }
-        @keyframes bbPulseRing {
-          0% { box-shadow: 0 0 0 0 rgba(139,92,246,0.45); }
-          70% { box-shadow: 0 0 0 18px rgba(139,92,246,0); }
-          100% { box-shadow: 0 0 0 0 rgba(139,92,246,0); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .bb-orb, .bb-path, .bb-pulse-ring, .reveal {
-            animation: none !important;
-            transition: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-          }
-        }
-      `}</style>
-
       {/* Navbar */}
       <header className="sticky top-0 z-50 px-4 pt-4 sm:px-6">
         <nav className="bb-glass mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-5 py-3">
@@ -488,18 +412,18 @@ export default function BrandBridgeLanding() {
 
           <div className="hidden items-center gap-7 text-sm text-white/70 md:flex">
             {navLinks.map((l) => (
-              <a key={l} href="#" className="transition hover:text-white">
-                {l}
+              <a key={l.label} href={l.href} className="transition hover:text-white">
+                {l.label}
               </a>
             ))}
           </div>
 
           <div className="hidden items-center gap-3 md:flex">
-            <a href="#" className="text-sm text-white/70 hover:text-white">
+            <a href="/login" className="text-sm text-white/70 hover:text-white">
               Login
             </a>
             <a
-              href="#"
+              href="/signup"
               className="bb-btn-primary rounded-xl px-4 py-2 text-sm font-medium"
             >
               Sign Up
@@ -518,16 +442,16 @@ export default function BrandBridgeLanding() {
         {menuOpen && (
           <div className="bb-glass mx-2 mt-2 flex flex-col gap-3 rounded-2xl p-5 text-sm text-white/80 md:hidden">
             {navLinks.map((l) => (
-              <a key={l} href="#" onClick={() => setMenuOpen(false)}>
-                {l}
+              <a key={l.label} href={l.href} onClick={() => setMenuOpen(false)}>
+                {l.label}
               </a>
             ))}
             <div className="mt-2 flex gap-3 border-t border-white/10 pt-3">
-              <a href="#" className="flex-1 text-center">
+              <a href="/login" className="flex-1 text-center">
                 Login
               </a>
               <a
-                href="#"
+                href="/signup"
                 className="bb-btn-primary flex-1 rounded-xl py-2 text-center font-medium"
               >
                 Sign Up
@@ -567,13 +491,13 @@ export default function BrandBridgeLanding() {
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
-              href="#"
+              href="/signup"
               className="bb-btn-primary flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium"
             >
               Get Started <ArrowRight size={16} />
             </a>
             <a
-              href="#"
+              href="#features"
               className="bb-glass rounded-xl px-6 py-3 text-sm font-medium text-white/80 hover:text-white"
             >
               Explore Platform
@@ -718,7 +642,7 @@ export default function BrandBridgeLanding() {
               match.
             </p>
             <a
-              href="#"
+              href="/signup"
               className="bb-btn-primary relative z-10 mt-7 inline-flex items-center gap-2 rounded-xl px-7 py-3 text-sm font-medium"
             >
               Get Started <ArrowRight size={16} />
