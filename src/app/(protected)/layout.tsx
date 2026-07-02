@@ -15,6 +15,7 @@ interface UserData {
   name: string;
   email: string;
   role?: UserRole;
+  avatar?: string;
 }
 
 export default function ProtectedLayout({
@@ -37,18 +38,11 @@ export default function ProtectedLayout({
       .then(async ([authRes, profileRes]) => {
         if (!authRes.ok) throw new Error("Unauthorized");
         const authData = await authRes.json();
-        setUser(authData.user);
-
-        if (!authData.user.role) {
-          router.replace("/signup");
-          return;
-        }
-
-        const role = authData.user.role as UserRole;
-        const roleFromPath = pathname.match(/^\/dashboard\/([^/]+)/)?.[1];
+        let avatar: string | undefined;
 
         if (profileRes.ok) {
           const profileData = await profileRes.json();
+          avatar = profileData.profile?.avatar;
           const complete = profileData.profile?.profileComplete ?? false;
           setProfileComplete(complete);
 
@@ -57,6 +51,16 @@ export default function ProtectedLayout({
             return;
           }
         }
+
+        setUser({ ...authData.user, avatar });
+
+        if (!authData.user.role) {
+          router.replace("/signup");
+          return;
+        }
+
+        const role = authData.user.role as UserRole;
+        const roleFromPath = pathname.match(/^\/dashboard\/([^/]+)/)?.[1];
 
         if (pathname === "/dashboard") {
           router.replace(getDashboardPath(role));

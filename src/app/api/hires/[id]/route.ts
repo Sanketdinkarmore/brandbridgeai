@@ -25,7 +25,37 @@ export async function PATCH(request: Request, { params }: Params) {
     const isFreelancer = hire.freelancerId.toString() === result.auth.userId;
     if (!isHirer && !isFreelancer) return jsonError("Forbidden", 403);
 
-    Object.assign(hire, parsed.data);
+    const newStatus = parsed.data!.status;
+    if (newStatus) {
+      if (isFreelancer) {
+        if (hire.status === "pending" && !["active", "cancelled"].includes(newStatus)) {
+          return jsonError("You can only accept or decline pending requests", 400);
+        }
+        if (hire.status === "active" && newStatus !== "completed") {
+          return jsonError("You can only mark active projects as completed", 400);
+        }
+        if (hire.status !== "pending" && hire.status !== "active") {
+          return jsonError("This hire can no longer be updated", 400);
+        }
+      }
+      if (isHirer) {
+        if (hire.status === "pending" && newStatus !== "cancelled") {
+          return jsonError("Wait for the freelancer to accept, or cancel the request", 400);
+        }
+        if (hire.status === "active" && newStatus !== "completed") {
+          return jsonError("You can only mark active hires as completed", 400);
+        }
+        if (hire.status === "pending" && newStatus === "cancelled") {
+          // allow hirer to withdraw
+        } else if (hire.status !== "active" && newStatus === "completed") {
+          return jsonError("Only active hires can be completed", 400);
+        }
+      }
+      hire.status = newStatus;
+    }
+
+    if (parsed.data!.rate !== undefined) hire.rate = parsed.data!.rate;
+    if (parsed.data!.notes !== undefined) hire.notes = parsed.data!.notes;
     await hire.save();
 
     const notifyId = isHirer ? hire.freelancerId.toString() : hire.hirerId.toString();

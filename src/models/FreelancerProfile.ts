@@ -27,7 +27,8 @@ const FreelancerProfileSchema = new Schema<IFreelancerProfile>(
   { timestamps: true },
 );
 
-FreelancerProfileSchema.index({ categories: 1, skills: 1 });
+// Single-field index only — MongoDB cannot compound-index two array fields
+FreelancerProfileSchema.index({ categories: 1 });
 
 const FreelancerProfile: Model<IFreelancerProfile> =
   mongoose.models.FreelancerProfile ||

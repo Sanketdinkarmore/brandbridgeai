@@ -147,6 +147,19 @@
   border-color: rgba(139, 92, 246, 0.5);
 }
 
+/* Native select dropdowns — OS menus often use a light background */
+.bb-input:is(select),
+select.bb-input {
+  cursor: pointer;
+  appearance: auto;
+}
+
+.bb-input option,
+select.bb-input option {
+  background-color: #ffffff;
+  color: #12121c;
+}
+
 .bb-input-error {
   border-color: rgba(239, 68, 68, 0.6);
 }

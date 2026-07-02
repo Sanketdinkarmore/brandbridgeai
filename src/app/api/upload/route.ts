@@ -20,10 +20,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ url: base64, fallback: true });
     }
 
-    const bytes = await file.arrayBuffer();
-    const base64 = Buffer.from(bytes).toString("base64");
-    const dataUri = `data:${file.type};base64,${base64}`;
-
     const timestamp = Math.round(Date.now() / 1000);
     const crypto = await import("crypto");
     const signature = crypto
@@ -31,18 +27,15 @@ export async function POST(request: Request) {
       .update(`timestamp=${timestamp}${apiSecret}`)
       .digest("hex");
 
+    const cloudForm = new FormData();
+    cloudForm.append("file", file);
+    cloudForm.append("api_key", apiKey);
+    cloudForm.append("timestamp", String(timestamp));
+    cloudForm.append("signature", signature);
+
     const uploadRes = await fetch(
       `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          file: dataUri,
-          api_key: apiKey,
-          timestamp,
-          signature,
-        }),
-      },
+      { method: "POST", body: cloudForm },
     );
 
     if (!uploadRes.ok) {
@@ -51,7 +44,9 @@ export async function POST(request: Request) {
     }
 
     const data = await uploadRes.json();
-    return NextResponse.json({ url: data.secure_url });
+    const url = data.secure_url as string | undefined;
+    if (!url) return jsonError("Upload succeeded but no URL returned", 500);
+    return NextResponse.json({ url });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

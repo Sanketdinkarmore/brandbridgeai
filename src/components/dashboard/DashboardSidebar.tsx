@@ -14,6 +14,7 @@ interface UserData {
   name: string;
   email: string;
   role?: UserRole;
+  avatar?: string;
 }
 
 interface DashboardSidebarProps {
@@ -84,11 +85,20 @@ export default function DashboardSidebar({
         })}
       </nav>
 
-      <div className="border-t border-white/10 p-4">
+        <div className="border-t border-white/10 p-4">
         {user && (
-          <div className="mb-3 px-2">
-            <div className="text-sm font-medium">{user.name}</div>
-            <div className="text-xs text-white/45">{user.email}</div>
+          <div className="mb-3 flex items-center gap-3 px-2">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-purple-500/20 text-sm font-semibold text-purple-200">
+              {user.avatar ? (
+                <img src={user.avatar} alt="" className="h-full w-full object-cover" />
+              ) : (
+                user.name.charAt(0).toUpperCase()
+              )}
+            </div>
+            <div className="min-w-0">
+              <div className="truncate text-sm font-medium">{user.name}</div>
+              <div className="truncate text-xs text-white/45">{user.email}</div>
+            </div>
           </div>
         )}
         <button

@@ -51,13 +51,42 @@ export default function ProfilePage({ role }: ProfilePageProps) {
       body: JSON.stringify({
         ...profileData,
         profileComplete: true,
-        freelancerProfile: role === "freelancer" ? { skills, categories, hourlyRate, availability, experience } : undefined,
+        freelancerProfile:
+          role === "freelancer"
+            ? {
+                skills: skills ?? [],
+                categories: categories ?? [],
+                hourlyRate,
+                availability,
+                experience,
+              }
+            : undefined,
       }),
     });
     if (!res.ok) {
       const err = await res.json();
       throw new Error(err.error);
     }
+    const saved = await res.json();
+    const p = saved.profile ?? {};
+    const fp = saved.freelancerProfile ?? {};
+    setInitial({
+      companyName: p.companyName,
+      bio: p.bio,
+      industry: p.industry,
+      location: p.location,
+      website: p.website,
+      targetAudience: p.targetAudience,
+      marketingBudget: p.marketingBudget,
+      hiringPreferences: p.hiringPreferences,
+      avatar: p.avatar,
+      logo: p.logo,
+      skills: fp.skills,
+      categories: fp.categories,
+      hourlyRate: fp.hourlyRate,
+      availability: fp.availability,
+      experience: fp.experience,
+    });
     router.refresh();
   }
 

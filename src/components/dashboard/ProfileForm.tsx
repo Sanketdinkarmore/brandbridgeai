@@ -32,6 +32,8 @@ export interface ProfileFormData {
   experience?: string;
 }
 
+const EMPTY_INITIAL: ProfileFormData = {};
+
 interface ProfileFormProps {
   role: UserRole;
   initial?: ProfileFormData;
@@ -41,14 +43,15 @@ interface ProfileFormProps {
 
 export default function ProfileForm({
   role,
-  initial = {},
+  initial,
   onSubmit,
   submitLabel = "Save Profile",
 }: ProfileFormProps) {
-  const [form, setForm] = useState<ProfileFormData>(initial);
+  const [form, setForm] = useState<ProfileFormData>(initial ?? EMPTY_INITIAL);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   function update(field: keyof ProfileFormData, value: unknown) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -58,14 +61,22 @@ export default function ProfileForm({
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setError("");
     try {
       const fd = new FormData();
       fd.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const data = await res.json();
-      if (data.url) update(field, data.url);
+      if (!res.ok) throw new Error(data.error ?? "Upload failed");
+      if (data.url) {
+        update(field, data.url);
+        setSuccess(`${field === "avatar" ? "Avatar" : "Logo"} uploaded — click Save to keep it`);
+      }
+    } catch (err) {
+      setError((err as Error).message);
     } finally {
       setUploading(false);
+      e.target.value = "";
     }
   }
 
@@ -73,8 +84,10 @@ export default function ProfileForm({
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
     try {
       await onSubmit({ ...form, profileComplete: true });
+      setSuccess("Profile saved successfully");
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -89,6 +102,31 @@ export default function ProfileForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {(form.avatar || form.logo) && (
+        <div className="bb-glass flex items-center gap-5 rounded-2xl p-5">
+          {form.avatar && (
+            <div className="text-center">
+              <img
+                src={form.avatar}
+                alt="Avatar"
+                className="h-20 w-20 rounded-2xl object-cover ring-2 ring-purple-500/30"
+              />
+              <p className="mt-1.5 text-[10px] text-white/40">Avatar</p>
+            </div>
+          )}
+          {form.logo && (
+            <div className="text-center">
+              <img
+                src={form.logo}
+                alt="Logo"
+                className="h-20 w-20 rounded-2xl object-cover ring-2 ring-purple-500/30"
+              />
+              <p className="mt-1.5 text-[10px] text-white/40">Logo</p>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="bb-glass rounded-2xl p-6 space-y-4">
         <h2 className="bb-display text-lg font-medium">Basic Information</h2>
 
@@ -128,7 +166,7 @@ export default function ProfileForm({
           <div>
             <label className="mb-1.5 block text-xs text-white/50">Industry</label>
             <select
-              className="bb-input w-full rounded-xl px-4 py-2.5 text-sm"
+              className="bb-input w-full rounded-xl px-4 py-2.5 text-sm "
               value={form.industry ?? ""}
               onChange={(e) => update("industry", e.target.value)}
             >
@@ -282,6 +320,7 @@ export default function ProfileForm({
       )}
 
       {error && <p className="text-sm text-red-400">{error}</p>}
+      {success && <p className="text-sm text-green-400">{success}</p>}
 
       <button
         type="submit"

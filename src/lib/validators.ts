@@ -57,7 +57,10 @@ export const profileSchema = z.object({
   website: z.string().url().optional().or(z.literal("")),
   socialLinks: socialLinksSchema,
   targetAudience: z.string().optional(),
-  marketingBudget: z.number().min(0).optional(),
+  marketingBudget: z.preprocess(
+    (val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : val),
+    z.number().min(0).optional(),
+  ),
   hiringPreferences: z.string().optional(),
   avatar: z.string().optional(),
   logo: z.string().optional(),
@@ -65,9 +68,12 @@ export const profileSchema = z.object({
 });
 
 export const freelancerProfileSchema = z.object({
-  skills: z.array(z.string()).optional(),
-  categories: z.array(z.string()).optional(),
-  hourlyRate: z.number().min(0).optional(),
+  skills: z.array(z.string()).optional().default([]),
+  categories: z.array(z.string()).optional().default([]),
+  hourlyRate: z.preprocess(
+    (val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : val),
+    z.number().min(0).optional(),
+  ),
   availability: z.string().optional(),
   experience: z.string().optional(),
 });

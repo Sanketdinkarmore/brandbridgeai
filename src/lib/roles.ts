@@ -99,6 +99,7 @@ export function getRoleNavItems(role: UserRole): NavItem[] {
         { href: `/dashboard/${role}/collaborations`, icon: Handshake, label: "Collaborations" },
         { href: `/dashboard/${role}/campaigns`, icon: Megaphone, label: "Campaigns" },
         { href: `/dashboard/${role}/marketplace`, icon: Store, label: "Hire Freelancers" },
+        { href: `/dashboard/${role}/hires`, icon: Handshake, label: "My Hires" },
         { href: `/dashboard/${role}/messages`, icon: MessageSquare, label: "Messages" },
         { href: `/dashboard/${role}/settings`, icon: Settings, label: "Settings" },
       ];

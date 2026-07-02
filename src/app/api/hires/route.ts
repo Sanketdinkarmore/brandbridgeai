@@ -55,7 +55,7 @@ export async function POST(request: Request) {
       "hire",
       "New hire request",
       "A brand wants to hire you for a project.",
-      "/dashboard/freelancer/projects",
+      "/dashboard/freelancer/earnings",
     );
 
     return NextResponse.json({ hire }, { status: 201 });

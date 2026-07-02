@@ -31,7 +31,13 @@ export default function OnboardingProfilePage() {
         profileComplete: true,
         freelancerProfile:
           role === "freelancer"
-            ? { skills, categories, hourlyRate, availability, experience }
+            ? {
+                skills: skills ?? [],
+                categories: categories ?? [],
+                hourlyRate,
+                availability,
+                experience,
+              }
             : undefined,
       }),
     });

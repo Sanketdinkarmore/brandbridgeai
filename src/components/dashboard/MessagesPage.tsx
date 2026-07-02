@@ -28,8 +28,15 @@ export default function MessagesPage({ role }: MessagesPageProps) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [myId, setMyId] = useState("");
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((d) => setMyId(d.user?._id ?? ""));
+  }, []);
 
   const loadConversations = useCallback(() => {
     fetch("/api/conversations")
@@ -100,7 +107,8 @@ export default function MessagesPage({ role }: MessagesPageProps) {
               <>
                 <div className="flex-1 space-y-3 overflow-y-auto p-4">
                   {messages.map((m) => {
-                    const isMine = m.senderId?._id !== undefined;
+                    const senderId = typeof m.senderId === "object" ? m.senderId._id : m.senderId;
+                    const isMine = String(senderId) === String(myId);
                     return (
                       <div
                         key={m._id}

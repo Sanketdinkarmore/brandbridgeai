@@ -26,5 +26,14 @@ export async function connectDB() {
     cached!.promise = mongoose.connect(MONGODB_URI).then((m) => m);
   }
   cached!.conn = await cached!.promise;
+
+  // Drop stale invalid indexes (e.g. parallel arrays on skills + categories)
+  try {
+    const FreelancerProfile = (await import("@/models/FreelancerProfile")).default;
+    await FreelancerProfile.syncIndexes();
+  } catch {
+    // Non-fatal — indexes may already be correct
+  }
+
   return cached!.conn;
 }
