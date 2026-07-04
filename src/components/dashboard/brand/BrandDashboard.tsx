@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Sparkles, Handshake, Megaphone, Store } from "lucide-react";
+import { Sparkles, Handshake, Megaphone, Store, Globe } from "lucide-react";
 import { ROLE_LABELS } from "@/lib/roles";
 import StatCard, { type StatCardConfig } from "@/components/dashboard/StatCard";
 import QuickActionsBar from "@/components/dashboard/brand/QuickActionsBar";
@@ -27,6 +27,9 @@ import {
   CardSkeleton,
 } from "@/components/dashboard/Skeleton";
 import EmptyState from "@/components/dashboard/EmptyState";
+import ExternalBrandCard from "@/components/dashboard/brand/ExternalBrandCard";
+import OutreachEmailModal from "@/components/dashboard/brand/OutreachEmailModal";
+import type { ExternalBrandRecommendation } from "@/lib/ai/matching";
 
 interface UserData {
   name: string;
@@ -68,6 +71,7 @@ export default function BrandDashboard() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<{ label: string; value: number }[]>([]);
   const [recommendations, setRecommendations] = useState<BrandRecommendation[]>([]);
+  const [externalRecommendations, setExternalRecommendations] = useState<ExternalBrandRecommendation[]>([]);
   const [pendingProposals, setPendingProposals] = useState<PendingProposal[]>([]);
   const [freelancers, setFreelancers] = useState<RecommendedFreelancer[]>([]);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
@@ -86,6 +90,11 @@ export default function BrandDashboard() {
   const [emailDraft, setEmailDraft] = useState("");
   const [proposalPartnerName, setProposalPartnerName] = useState("");
 
+  const [outreachOpen, setOutreachOpen] = useState(false);
+  const [outreachLoading, setOutreachLoading] = useState(false);
+  const [outreachTargetName, setOutreachTargetName] = useState("");
+  const [outreachEmailDraft, setOutreachEmailDraft] = useState("");
+
   const loadDashboard = useCallback(async () => {
     setLoading(true);
     try {
@@ -98,6 +107,7 @@ export default function BrandDashboard() {
       setUser(userData.user);
       if (dashData.stats) setStats(dashData.stats);
       if (dashData.recommendations) setRecommendations(dashData.recommendations);
+      if (dashData.externalRecommendations) setExternalRecommendations(dashData.externalRecommendations);
       if (dashData.pendingProposals) setPendingProposals(dashData.pendingProposals);
       if (dashData.recommendedFreelancers) setFreelancers(dashData.recommendedFreelancers);
       if (dashData.activity) setActivity(dashData.activity);
@@ -145,6 +155,29 @@ export default function BrandDashboard() {
       setEmailDraft(data.proposal?.emailDraft ?? "");
     } finally {
       setProposalLoading(false);
+    }
+  }
+
+  async function generateOutreachEmail(targetBrandName: string) {
+    setOutreachTargetName(targetBrandName);
+    setOutreachOpen(true);
+    setOutreachLoading(true);
+    setOutreachEmailDraft("");
+    
+    try {
+      const res = await fetch("/api/ai/outreach", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ targetBrandName }),
+      });
+      const data = await res.json();
+      setOutreachEmailDraft(data.emailDraft ?? "");
+    } catch (err) {
+      console.error(err);
+      setOutreachEmailDraft("Failed to generate draft. Please try again.");
+    } finally {
+      setOutreachLoading(false);
     }
   }
 
@@ -228,11 +261,11 @@ export default function BrandDashboard() {
             <ActivityFeed items={activity} />
           </div>
 
-          {/* AI Brand Recommendations */}
+          {/* Registered Brand Matches */}
           <div className="mt-8">
             <div className="mb-4 flex items-center gap-2">
               <Sparkles size={18} className="text-purple-300" />
-              <h2 className="bb-display text-lg font-medium">AI Brand Recommendations</h2>
+              <h2 className="bb-display text-lg font-medium">Registered Brand Matches</h2>
             </div>
             {recommendations.length === 0 ? (
               <EmptyState
@@ -256,6 +289,34 @@ export default function BrandDashboard() {
                     rec={rec}
                     onViewDetails={() => openBrandDetail(rec.brandId)}
                     onSendRequest={() => startCollaboration(rec.brandId, rec.companyName)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Discover External Brands */}
+          <div className="mt-8 pt-8 border-t border-white/5">
+            <div className="mb-4 flex items-center gap-2">
+              <Globe size={18} className="text-purple-300" />
+              <h2 className="bb-display text-lg font-medium">Discover External Brands</h2>
+            </div>
+            <p className="mb-4 text-sm text-white/50">
+              AI-generated suggestions for real-world brands that align with your profile. These brands are not yet on BrandBridge.
+            </p>
+            {externalRecommendations.length === 0 ? (
+               <EmptyState
+                icon={Globe}
+                title="No external leads found"
+                description="We couldn't generate external brand leads at this time."
+              />
+            ) : (
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+                {externalRecommendations.map((rec, i) => (
+                  <ExternalBrandCard
+                    key={i}
+                    rec={rec}
+                    onGenerateOutreach={() => generateOutreachEmail(rec.companyName)}
                   />
                 ))}
               </div>
@@ -340,6 +401,14 @@ export default function BrandDashboard() {
         emailDraft={emailDraft}
         onClose={() => setProposalOpen(false)}
         onSend={sendCollaboration}
+      />
+
+      <OutreachEmailModal
+        open={outreachOpen}
+        loading={outreachLoading}
+        targetBrandName={outreachTargetName}
+        emailDraft={outreachEmailDraft}
+        onClose={() => setOutreachOpen(false)}
       />
     </div>
   );

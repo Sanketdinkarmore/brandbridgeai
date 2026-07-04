@@ -11,7 +11,7 @@ import User from "@/models/User";
 import FreelancerProfile from "@/models/FreelancerProfile";
 import PortfolioItem from "@/models/PortfolioItem";
 import Proposal from "@/models/Proposal";
-import { analyzeBrandCompatibility } from "@/lib/ai/matching";
+import { analyzeBrandCompatibility, discoverExternalBrands } from "@/lib/ai/matching";
 import { calculateProfileCompleteness } from "@/lib/profile-completeness";
 
 export async function GET() {
@@ -48,7 +48,7 @@ export async function GET() {
       profileComplete: true,
     }).limit(5);
 
-    const recommendations = await Promise.all(
+    const recommendationsPromise = Promise.all(
       candidateBrands.slice(0, 3).map(async (b) => {
         const match = await analyzeBrandCompatibility(
           {
@@ -78,6 +78,19 @@ export async function GET() {
         };
       }),
     );
+
+    const externalRecommendationsPromise = discoverExternalBrands({
+      companyName: myProfile.companyName,
+      industry: myProfile.industry,
+      targetAudience: myProfile.targetAudience,
+      marketingBudget: myProfile.marketingBudget,
+      bio: myProfile.bio,
+    });
+
+    const [recommendations, externalRecommendations] = await Promise.all([
+      recommendationsPromise,
+      externalRecommendationsPromise,
+    ]);
 
     recommendations.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
 
@@ -203,6 +216,7 @@ export async function GET() {
     return NextResponse.json({
       stats,
       recommendations,
+      externalRecommendations,
       pendingProposals,
       recommendedFreelancers,
       activity: activity.slice(0, 8),

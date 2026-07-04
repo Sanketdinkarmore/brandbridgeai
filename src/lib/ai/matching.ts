@@ -139,3 +139,49 @@ Respond JSON only: {"compatibilityScore":<number>,"audienceMatch":"<text>","camp
   }
   return results.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
 }
+
+export interface ExternalBrandRecommendation {
+  companyName: string;
+  industry: string;
+  reason: string;
+  estimatedReach: string;
+  isExternal: true;
+}
+
+export async function discoverExternalBrands(
+  currentBrand: BrandProfileData,
+): Promise<ExternalBrandRecommendation[]> {
+  const prompt = `You are a B2B brand collaboration analyst. Based on the following brand profile, suggest 3 real-world companies (not generic, but actual brands) that would make excellent strategic partners for a co-marketing campaign or collaboration.
+  
+Brand (current user):
+- Company: ${currentBrand.companyName || "N/A"}
+- Industry: ${currentBrand.industry || "N/A"}
+- Target Audience: ${currentBrand.targetAudience || "N/A"}
+- Budget: ${currentBrand.marketingBudget || "N/A"}
+- Bio: ${currentBrand.bio || "N/A"}
+
+Respond in JSON only with this exact structure:
+{
+  "recommendations": [
+    {
+      "companyName": "<real world company name>",
+      "industry": "<company industry>",
+      "reason": "<1-2 sentence summary of why they are a good match>",
+      "estimatedReach": "<estimated audience size, e.g. '1M+ followers'>"
+    }
+  ]
+}`;
+
+  try {
+    const text = await generateText(prompt);
+    const jsonMatch = text.match(/\\{[\\s\\S]*\\}/);
+    if (!jsonMatch) throw new Error("No JSON");
+    const parsed = JSON.parse(jsonMatch[0]);
+    return (parsed.recommendations || []).map((rec: any) => ({
+      ...rec,
+      isExternal: true,
+    }));
+  } catch {
+    return [];
+  }
+}
