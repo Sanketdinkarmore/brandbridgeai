@@ -32,6 +32,17 @@ Do NOT create advertisements. Focus on collaboration strategy and partnership va
 
   try {
     const text = await generateText(prompt);
+    if (!text) {
+      return {
+        proposal: `Dear ${partner.companyName || partner.name} team,\n\nWe at ${initiator.companyName || initiator.name} believe there is strong synergy between our brands. Our shared focus on ${initiator.industry || "the market"} presents an opportunity for a collaborative campaign that benefits both audiences.\n\nWe propose a co-marketing initiative leveraging our complementary strengths to reduce costs and expand reach.\n\nWe look forward to discussing this partnership.`,
+        emailDraft: `Subject: Collaboration Opportunity — ${initiator.companyName || initiator.name} × ${partner.companyName || partner.name}\n\nHi ${partner.name},\n\nI'm reaching out from ${initiator.companyName || initiator.name}. We've identified a strong alignment between our brands and would love to explore a collaboration.\n\nWould you be open to a brief call this week?\n\nBest regards,\n${initiator.name}`,
+        campaignNameSuggestions: [
+          `${initiator.companyName || "Brand"} × ${partner.companyName || "Partner"} Collab`,
+          "Synergy Campaign 2026",
+          "Partners in Growth",
+        ],
+      };
+    }
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("No JSON");
     const parsed = JSON.parse(jsonMatch[0]);

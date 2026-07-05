@@ -40,7 +40,9 @@ export default function ExternalBrandCard({
       
       <div className="mt-4 pt-3 border-t border-white/5 flex flex-col gap-2">
         <p className="text-[10px] text-center italic text-white/40 mb-1">
-          AI-generated — please verify before reaching out.
+          {rec.source === "curated"
+            ? "Curated match — verify before reaching out. Retry later for AI-generated leads."
+            : "AI-generated — please verify before reaching out."}
         </p>
         <button
           onClick={(e) => {

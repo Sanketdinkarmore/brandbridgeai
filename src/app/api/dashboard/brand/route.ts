@@ -11,7 +11,7 @@ import User from "@/models/User";
 import FreelancerProfile from "@/models/FreelancerProfile";
 import PortfolioItem from "@/models/PortfolioItem";
 import Proposal from "@/models/Proposal";
-import { analyzeBrandCompatibility, discoverExternalBrands } from "@/lib/ai/matching";
+import { heuristicBrandMatch } from "@/lib/ai/matching";
 import { calculateProfileCompleteness } from "@/lib/profile-completeness";
 
 export async function GET() {
@@ -48,10 +48,8 @@ export async function GET() {
       profileComplete: true,
     }).limit(5);
 
-    // Run sequentially instead of Promise.all to avoid hitting the free tier burst rate limit
-    const recommendations = [];
-    for (const b of candidateBrands.slice(0, 3)) {
-      const match = await analyzeBrandCompatibility(
+    const recommendations = candidateBrands.slice(0, 3).map((b) => {
+      const match = heuristicBrandMatch(
         {
           companyName: myProfile.companyName,
           industry: myProfile.industry,
@@ -68,7 +66,7 @@ export async function GET() {
           bio: b.bio,
         },
       );
-      recommendations.push({
+      return {
         brandId: b.userId.toString(),
         companyName: b.companyName || "Brand",
         logo: b.logo,
@@ -76,15 +74,7 @@ export async function GET() {
         compatibilityScore: match.compatibilityScore,
         reason: match.audienceMatch,
         estimatedReach: match.estimatedReach,
-      });
-    }
-
-    const externalRecommendations = await discoverExternalBrands({
-      companyName: myProfile.companyName,
-      industry: myProfile.industry,
-      targetAudience: myProfile.targetAudience,
-      marketingBudget: myProfile.marketingBudget,
-      bio: myProfile.bio,
+      };
     });
 
     recommendations.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
@@ -211,7 +201,6 @@ export async function GET() {
     return NextResponse.json({
       stats,
       recommendations,
-      externalRecommendations,
       pendingProposals,
       recommendedFreelancers,
       activity: activity.slice(0, 8),

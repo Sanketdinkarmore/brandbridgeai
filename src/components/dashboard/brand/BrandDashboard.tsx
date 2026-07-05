@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Sparkles, Handshake, Megaphone, Store, Globe } from "lucide-react";
 import { ROLE_LABELS } from "@/lib/roles";
 import StatCard, { type StatCardConfig } from "@/components/dashboard/StatCard";
@@ -25,6 +25,7 @@ import RecommendedFreelancersSection, {
 import {
   StatCardSkeleton,
   CardSkeleton,
+  RecommendationSkeleton,
 } from "@/components/dashboard/Skeleton";
 import EmptyState from "@/components/dashboard/EmptyState";
 import ExternalBrandCard from "@/components/dashboard/brand/ExternalBrandCard";
@@ -72,6 +73,10 @@ export default function BrandDashboard() {
   const [stats, setStats] = useState<{ label: string; value: number }[]>([]);
   const [recommendations, setRecommendations] = useState<BrandRecommendation[]>([]);
   const [externalRecommendations, setExternalRecommendations] = useState<ExternalBrandRecommendation[]>([]);
+  const [externalLoading, setExternalLoading] = useState(true);
+  const [externalSource, setExternalSource] = useState<"ai" | "curated" | "none">("none");
+  const [externalQuotaBlocked, setExternalQuotaBlocked] = useState(false);
+  const externalFetchStarted = useRef(false);
   const [pendingProposals, setPendingProposals] = useState<PendingProposal[]>([]);
   const [freelancers, setFreelancers] = useState<RecommendedFreelancer[]>([]);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
@@ -107,7 +112,6 @@ export default function BrandDashboard() {
       setUser(userData.user);
       if (dashData.stats) setStats(dashData.stats);
       if (dashData.recommendations) setRecommendations(dashData.recommendations);
-      if (dashData.externalRecommendations) setExternalRecommendations(dashData.externalRecommendations);
       if (dashData.pendingProposals) setPendingProposals(dashData.pendingProposals);
       if (dashData.recommendedFreelancers) setFreelancers(dashData.recommendedFreelancers);
       if (dashData.activity) setActivity(dashData.activity);
@@ -118,9 +122,33 @@ export default function BrandDashboard() {
     }
   }, []);
 
+  const loadExternalBrands = useCallback(async (refresh = false) => {
+    setExternalLoading(true);
+    try {
+      const url = refresh
+        ? "/api/ai/external-brands?refresh=true"
+        : "/api/ai/external-brands";
+      const res = await fetch(url, { credentials: "include" });
+      const data = await res.json();
+      if (data.recommendations) setExternalRecommendations(data.recommendations);
+      if (data.source) setExternalSource(data.source);
+      setExternalQuotaBlocked(Boolean(data.quotaBlocked));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setExternalLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
+
+  useEffect(() => {
+    if (externalFetchStarted.current) return;
+    externalFetchStarted.current = true;
+    loadExternalBrands();
+  }, [loadExternalBrands]);
 
   async function openBrandDetail(brandId: string) {
     setSelectedPartnerId(brandId);
@@ -302,19 +330,46 @@ export default function BrandDashboard() {
               <h2 className="bb-display text-lg font-medium">Discover External Brands</h2>
             </div>
             <p className="mb-4 text-sm text-white/50">
-              AI-generated suggestions for real-world brands that align with your profile. These brands are not yet on BrandBridge.
+              {externalSource === "ai"
+                ? "AI-generated suggestions for real-world brands that align with your profile. These brands are not yet on BrandBridge."
+                : externalSource === "curated"
+                  ? "Profile-matched brand suggestions while Gemini AI is rate-limited. Refresh in a few minutes for fully AI-generated leads."
+                  : "AI-generated suggestions for real-world brands that align with your profile. These brands are not yet on BrandBridge."}
             </p>
-            {externalRecommendations.length === 0 ? (
-               <EmptyState
+            {externalQuotaBlocked && externalSource === "curated" && (
+              <p className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-xs text-amber-200/90">
+                Gemini API quota reached — showing curated matches for your industry. Wait ~5 minutes, then click Retry for fresh AI suggestions.
+              </p>
+            )}
+            {externalLoading ? (
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <RecommendationSkeleton key={i} />
+                ))}
+              </div>
+            ) : externalRecommendations.length === 0 ? (
+              <EmptyState
                 icon={Globe}
                 title="No external leads found"
-                description="We couldn't generate external brand leads at this time."
+                description={
+                  externalQuotaBlocked
+                    ? "Gemini API quota is temporarily exceeded. Wait a few minutes and retry, or complete your industry and location in your profile for better matches."
+                    : "We couldn't generate external brand leads. Ensure GEMINI_API_KEY is set in .env.local and your profile is complete."
+                }
+                action={
+                  <button
+                    onClick={() => loadExternalBrands(true)}
+                    className="bb-btn-primary rounded-xl px-4 py-2 text-sm"
+                  >
+                    Retry AI Suggestions
+                  </button>
+                }
               />
             ) : (
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-                {externalRecommendations.map((rec, i) => (
+                {externalRecommendations.map((rec) => (
                   <ExternalBrandCard
-                    key={i}
+                    key={rec.companyName}
                     rec={rec}
                     onGenerateOutreach={() => generateOutreachEmail(rec.companyName)}
                   />

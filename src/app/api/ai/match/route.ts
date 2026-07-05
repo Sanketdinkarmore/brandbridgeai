@@ -41,15 +41,16 @@ export async function POST(request: Request) {
               marketingBudget: myProfile.marketingBudget,
               bio: myProfile.bio,
             },
-            {
-              brandId: b.userId.toString(),
-              companyName: b.companyName,
-              industry: b.industry,
-              targetAudience: b.targetAudience,
-              marketingBudget: b.marketingBudget,
-              bio: b.bio,
-            },
-          );
+        {
+          brandId: b.userId.toString(),
+          companyName: b.companyName,
+          industry: b.industry,
+          targetAudience: b.targetAudience,
+          marketingBudget: b.marketingBudget,
+          bio: b.bio,
+        },
+        { useAi: true },
+      );
         }),
       );
 
