@@ -22,6 +22,29 @@ export interface IProfile extends Document {
   targetAudience?: string;
   marketingBudget?: number;
   hiringPreferences?: string;
+
+  // New Brand Profile Fields
+  companySize?: string;
+  foundedYear?: number;
+  businessType?: string;
+  isRegisteredBusiness?: boolean;
+  businessRegistrationNumber?: string;
+  taxId?: string;
+  subCategory?: string;
+  targetAgeGroups?: string[];
+  targetGender?: string;
+  primaryMarket?: string;
+  socialMediaReach?: {
+    instagram?: number;
+    youtube?: number;
+    facebook?: number;
+    tiktok?: number;
+  };
+  collaborationLookingFor?: string[];
+  preferredCollaborationType?: string;
+  budgetRange?: string;
+  availabilityStatus?: string;
+
   profileComplete: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -51,6 +74,29 @@ const ProfileSchema = new Schema<IProfile>(
     targetAudience: String,
     marketingBudget: Number,
     hiringPreferences: String,
+
+    // New Brand Profile Fields
+    companySize: String,
+    foundedYear: Number,
+    businessType: String,
+    isRegisteredBusiness: { type: Boolean, default: false },
+    businessRegistrationNumber: String,
+    taxId: String,
+    subCategory: String,
+    targetAgeGroups: [String],
+    targetGender: String,
+    primaryMarket: String,
+    socialMediaReach: {
+      instagram: Number,
+      youtube: Number,
+      facebook: Number,
+      tiktok: Number,
+    },
+    collaborationLookingFor: [String],
+    preferredCollaborationType: String,
+    budgetRange: String,
+    availabilityStatus: { type: String, default: "Open to offers" },
+
     profileComplete: { type: Boolean, default: false },
   },
   { timestamps: true },

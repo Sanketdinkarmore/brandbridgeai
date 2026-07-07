@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ProfileForm, { type ProfileFormData } from "./ProfileForm";
+import BrandProfileForm from "./brand/BrandProfileForm";
 import PageHeader from "./PageHeader";
 import type { UserRole } from "@/lib/roles";
 import { getDashboardPath } from "@/lib/roles";
@@ -23,16 +24,7 @@ export default function ProfilePage({ role }: ProfilePageProps) {
         const p = d.profile ?? {};
         const fp = d.freelancerProfile ?? {};
         setInitial({
-          companyName: p.companyName,
-          bio: p.bio,
-          industry: p.industry,
-          location: p.location,
-          website: p.website,
-          targetAudience: p.targetAudience,
-          marketingBudget: p.marketingBudget,
-          hiringPreferences: p.hiringPreferences,
-          avatar: p.avatar,
-          logo: p.logo,
+          ...p,
           skills: fp.skills,
           categories: fp.categories,
           hourlyRate: fp.hourlyRate,
@@ -43,8 +35,8 @@ export default function ProfilePage({ role }: ProfilePageProps) {
       .finally(() => setLoading(false));
   }, []);
 
-  async function handleSubmit(data: ProfileFormData & { profileComplete?: boolean }) {
-    const { skills, categories, hourlyRate, availability, experience, ...profileData } = data;
+  async function handleSubmit(data: any) {
+    const { skills, categories, hourlyRate, availability, experience, _id, createdAt, updatedAt, __v, ...profileData } = data;
     const res = await fetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -71,16 +63,7 @@ export default function ProfilePage({ role }: ProfilePageProps) {
     const p = saved.profile ?? {};
     const fp = saved.freelancerProfile ?? {};
     setInitial({
-      companyName: p.companyName,
-      bio: p.bio,
-      industry: p.industry,
-      location: p.location,
-      website: p.website,
-      targetAudience: p.targetAudience,
-      marketingBudget: p.marketingBudget,
-      hiringPreferences: p.hiringPreferences,
-      avatar: p.avatar,
-      logo: p.logo,
+      ...p,
       skills: fp.skills,
       categories: fp.categories,
       hourlyRate: fp.hourlyRate,
@@ -95,7 +78,11 @@ export default function ProfilePage({ role }: ProfilePageProps) {
   return (
     <div>
       <PageHeader title="My Profile" subtitle="Manage your public profile and preferences" />
-      <ProfileForm role={role} initial={initial} onSubmit={handleSubmit} />
+      {role === "brand" ? (
+        <BrandProfileForm initial={initial} onSubmit={handleSubmit} />
+      ) : (
+        <ProfileForm role={role} initial={initial} onSubmit={handleSubmit} />
+      )}
     </div>
   );
 }

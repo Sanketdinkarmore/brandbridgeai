@@ -8,7 +8,9 @@ const BRAND_FIELDS: (keyof IProfile)[] = [
   "location",
   "website",
   "targetAudience",
-  "marketingBudget",
+  "budgetRange",
+  "collaborationLookingFor",
+  "businessType",
 ];
 
 export interface ProfileCompletenessResult {
@@ -24,7 +26,9 @@ const FIELD_LABELS: Partial<Record<keyof IProfile, string>> = {
   location: "Add location",
   website: "Add website URL",
   targetAudience: "Define target audience",
-  marketingBudget: "Set marketing budget",
+  budgetRange: "Set budget range",
+  collaborationLookingFor: "Add collaboration preferences",
+  businessType: "Set business type",
 };
 
 export function calculateProfileCompleteness(
