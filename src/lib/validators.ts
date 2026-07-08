@@ -65,6 +65,28 @@ export const profileSchema = z.object({
   avatar: z.string().optional(),
   logo: z.string().optional(),
   profileComplete: z.boolean().optional(),
+  
+  // New Brand Profile Fields
+  companySize: z.string().optional(),
+  foundedYear: z.preprocess((val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : Number(val)), z.number().optional()),
+  businessType: z.string().optional(),
+  isRegisteredBusiness: z.boolean().optional(),
+  businessRegistrationNumber: z.string().optional(),
+  taxId: z.string().optional(),
+  subCategory: z.string().optional(),
+  targetAgeGroups: z.array(z.string()).optional(),
+  targetGender: z.string().optional(),
+  primaryMarket: z.string().optional(),
+  socialMediaReach: z.object({
+    instagram: z.preprocess((val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : Number(val)), z.number().optional()),
+    youtube: z.preprocess((val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : Number(val)), z.number().optional()),
+    facebook: z.preprocess((val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : Number(val)), z.number().optional()),
+    tiktok: z.preprocess((val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : Number(val)), z.number().optional()),
+  }).optional(),
+  collaborationLookingFor: z.array(z.string()).optional(),
+  preferredCollaborationType: z.string().optional(),
+  budgetRange: z.string().optional(),
+  availabilityStatus: z.string().optional(),
 });
 
 export const freelancerProfileSchema = z.object({
