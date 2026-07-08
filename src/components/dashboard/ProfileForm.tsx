@@ -240,6 +240,42 @@ export default function ProfileForm({
         </div>
       </div>
 
+      {(role === "brand" || role === "product_owner" || role === "hirer") && (
+        <div className="bb-glass rounded-2xl p-6 space-y-4">
+          <h2 className="bb-display text-lg font-medium">Enterprise & Verification</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-xs text-white/50">GST Identification Number (GSTIN)</label>
+              <input
+                className="bb-input w-full rounded-xl px-4 py-2.5 text-sm"
+                placeholder="27AAAPB1904H1Z4"
+                defaultValue="27AAAPB1904H1Z4"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs text-white/50">Permanent Account Number (PAN)</label>
+              <input
+                className="bb-input w-full rounded-xl px-4 py-2.5 text-sm"
+                placeholder="AAPCB1289H"
+                defaultValue="AAPCB1289H"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 border-t border-white/5 pt-4">
+            <div>
+              <span className="block text-xs text-white/40 mb-1">Company Trust Reputation</span>
+              <span className="text-sm font-bold text-green-400">96% Verified Score</span>
+            </div>
+            <div>
+              <span className="block text-xs text-white/40 mb-1">Achievements & Verified Badges</span>
+              <span className="inline-block text-[10px] bg-purple-500/15 text-purple-300 font-semibold px-2 py-0.5 rounded mr-2">Top Partner</span>
+              <span className="inline-block text-[10px] bg-blue-500/15 text-blue-300 font-semibold px-2 py-0.5 rounded">Fast Responder</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {role === "freelancer" && (
         <div className="bb-glass rounded-2xl p-6 space-y-4">
           <h2 className="bb-display text-lg font-medium">Freelancer Details</h2>

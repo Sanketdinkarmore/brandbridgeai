@@ -110,6 +110,7 @@ export function getRoleNavItems(role: UserRole): NavItem[] {
         { href: `/dashboard/${role}/products`, icon: Package, label: "My Products" },
         { href: `/dashboard/${role}/campaigns`, icon: Megaphone, label: "Campaigns" },
         { href: `/dashboard/${role}/messages`, icon: MessageSquare, label: "Messages" },
+        { href: `/dashboard/${role}/ai-hub`, icon: Sparkles, label: "AI Hub" },
         { href: `/dashboard/${role}/settings`, icon: Settings, label: "Settings" },
       ];
     case "freelancer":

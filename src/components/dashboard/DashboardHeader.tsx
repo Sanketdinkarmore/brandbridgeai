@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Bell, Menu } from "lucide-react";
+import { Bell, Menu, Search } from "lucide-react";
 import type { UserRole } from "@/lib/roles";
 
 interface Notification {
@@ -16,9 +16,10 @@ interface Notification {
 interface DashboardHeaderProps {
   role?: UserRole;
   onMenuOpen: () => void;
+  onSearchOpen?: () => void;
 }
 
-export default function DashboardHeader({ role, onMenuOpen }: DashboardHeaderProps) {
+export default function DashboardHeader({ role, onMenuOpen, onSearchOpen }: DashboardHeaderProps) {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -49,7 +50,14 @@ export default function DashboardHeader({ role, onMenuOpen }: DashboardHeaderPro
         <Menu size={22} />
       </button>
       <div className="flex-1" />
-      <div className="relative">
+      <div className="flex items-center gap-1.5 relative">
+        <button
+          onClick={onSearchOpen}
+          className="rounded-xl p-2 text-white/60 hover:bg-white/5 hover:text-white cursor-pointer"
+          title="Search (Ctrl+K)"
+        >
+          <Search size={18} />
+        </button>
         <button
           onClick={() => setOpen(!open)}
           className="relative rounded-xl p-2 text-white/60 hover:bg-white/5 hover:text-white"

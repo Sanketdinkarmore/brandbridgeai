@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import GlobalSearchModal from "@/components/dashboard/GlobalSearchModal";
 import {
   getDashboardPath,
   isValidRole,
@@ -29,6 +30,18 @@ export default function ProtectedLayout({
   const [profileComplete, setProfileComplete] = useState<boolean | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   useEffect(() => {
     Promise.all([
@@ -109,9 +122,15 @@ export default function ProtectedLayout({
       )}
 
       <div className="flex flex-1 flex-col">
-        <DashboardHeader role={user?.role} onMenuOpen={() => setSidebarOpen(true)} />
+        <DashboardHeader
+          role={user?.role}
+          onMenuOpen={() => setSidebarOpen(true)}
+          onSearchOpen={() => setSearchOpen(true)}
+        />
         <main className="flex-1 overflow-auto p-5 sm:p-8">{children}</main>
       </div>
+
+      {searchOpen && <GlobalSearchModal onClose={() => setSearchOpen(false)} />}
     </div>
   );
 }
