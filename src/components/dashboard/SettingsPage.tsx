@@ -149,52 +149,55 @@ export default function SettingsPage({ role }: SettingsPageProps) {
 
 
         {/* Workflow Automations Hub */}
-        <div className="bb-glass rounded-2xl p-6 space-y-4">
-          <h2 className="bb-display text-lg font-medium text-white">Workflow Automations Hub</h2>
-          <div className="space-y-3">
-            {[
-              {
-                id: "1",
-                name: "Campaign Approved Workflow",
-                trigger: "Campaign approved",
-                actions: ["Create tasks", "Notify team", "Generate report", "Send email"],
-                active: true,
-              },
-              {
-                id: "2",
-                name: "Outreach Accepted Setup",
-                trigger: "Collaboration accepted",
-                actions: ["Schedule sync meeting", "Notify stakeholders"],
-                active: false,
-              },
-            ].map((auto) => (
-              <div
-                key={auto.id}
-                className="flex items-center justify-between rounded-xl bg-white/3 border border-white/5 p-4"
-              >
-                <div>
-                  <span className="text-xs font-semibold text-white">{auto.name}</span>
-                  <div className="text-[10px] text-white/40 mt-1 leading-relaxed">
-                    Trigger: <span className="text-purple-300 font-semibold">{auto.trigger}</span>
-                    <br />
-                    Actions: {auto.actions.join(" → ")}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => alert(`Automation toggle action saved.`)}
-                  className={`rounded-lg px-2.5 py-1 text-[10px] font-semibold cursor-pointer ${
-                    auto.active
-                      ? "bg-purple-500/20 text-purple-200"
-                      : "bg-white/5 text-white/40 hover:bg-white/10"
-                  }`}
+        {role !== "product_owner" && (
+          <div className="bb-glass rounded-2xl p-6 space-y-4">
+            <h2 className="bb-display text-lg font-medium text-white">Workflow Automations Hub</h2>
+            <div className="space-y-3">
+              {[
+                {
+                  id: "1",
+                  name: "Campaign Approved Workflow",
+                  trigger: "Campaign approved",
+                  actions: ["Create tasks", "Notify team", "Generate report", "Send email"],
+                  active: true,
+                },
+                {
+                  id: "2",
+                  name: "Outreach Accepted Setup",
+                  trigger: "Collaboration accepted",
+                  actions: ["Schedule sync meeting", "Notify stakeholders"],
+                  active: false,
+                },
+              ].map((auto) => (
+                <div
+                  key={auto.id}
+                  className="flex items-center justify-between rounded-xl bg-white/3 border border-white/5 p-4"
                 >
-                  {auto.active ? "Enabled" : "Disabled"}
-                </button>
-              </div>
-            ))}
+                  <div>
+                    <span className="text-xs font-semibold text-white">{auto.name}</span>
+                    <div className="text-[10px] text-white/40 mt-1 leading-relaxed">
+                      Trigger: <span className="text-purple-300 font-semibold">{auto.trigger}</span>
+                      <br />
+                      Actions: {auto.actions.join(" → ")}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => alert(`Automation toggle action saved.`)}
+                    className={`rounded-lg px-2.5 py-1 text-[10px] font-semibold cursor-pointer ${
+                      auto.active
+                        ? "bg-purple-500/20 text-purple-200"
+                        : "bg-white/5 text-white/40 hover:bg-white/10"
+                    }`}
+                  >
+                    {auto.active ? "Enabled" : "Disabled"}
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
 
         {/* 2FA & Privacy */}
         <div className="bb-glass rounded-2xl p-6 space-y-4">
