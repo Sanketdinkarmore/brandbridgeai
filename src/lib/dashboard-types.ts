@@ -84,12 +84,14 @@ export interface HireItem {
 
 export interface FreelancerItem {
   user?: { _id: string; name: string };
-  profile?: { avatar?: string };
+  profile?: { avatar?: string; location?: string; bio?: string };
   freelancerProfile?: {
     skills?: string[];
     categories?: string[];
     hourlyRate?: number;
     rating?: number;
+    completedProjects?: number;
+    availability?: string;
   };
   portfolio?: { mediaUrl: string; title: string }[];
   saved?: boolean;

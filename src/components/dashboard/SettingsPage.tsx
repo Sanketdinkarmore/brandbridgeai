@@ -200,29 +200,31 @@ export default function SettingsPage({ role }: SettingsPageProps) {
 
 
         {/* 2FA & Privacy */}
-        <div className="bb-glass rounded-2xl p-6 space-y-4">
-          <h2 className="bb-display text-lg font-medium text-white">Security & 2-Factor Authentication</h2>
-          <div className="flex justify-between items-center text-xs text-white/80">
-            <div>
-              <span className="font-semibold block">Enable 2-Factor Authentication (2FA)</span>
-              <span className="text-white/40">Secure your corporate login with TOTP Google Authenticator.</span>
+        {role !== "product_owner" && (
+          <div className="bb-glass rounded-2xl p-6 space-y-4">
+            <h2 className="bb-display text-lg font-medium text-white">Security & 2-Factor Authentication</h2>
+            <div className="flex justify-between items-center text-xs text-white/80">
+              <div>
+                <span className="font-semibold block">Enable 2-Factor Authentication (2FA)</span>
+                <span className="text-white/40">Secure your corporate login with TOTP Google Authenticator.</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => alert("2FA Setup Dialog initialized.")}
+                className="bg-purple-500/20 text-purple-200 border border-purple-500/25 px-3 py-1.5 rounded-xl font-semibold cursor-pointer"
+              >
+                Setup 2FA
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => alert("2FA Setup Dialog initialized.")}
-              className="bg-purple-500/20 text-purple-200 border border-purple-500/25 px-3 py-1.5 rounded-xl font-semibold cursor-pointer"
-            >
-              Setup 2FA
-            </button>
-          </div>
-          <div className="border-t border-white/5 pt-4 space-y-2">
-            <span className="block text-xs text-white/45 uppercase font-bold">Active Device Sessions</span>
-            <div className="text-[11px] text-white/60 space-y-1">
-              <p>• Chrome on Windows (Current session) - Mumbai, India</p>
-              <p className="opacity-50">• Safari on iOS iPhone 14 - Pune, India</p>
+            <div className="border-t border-white/5 pt-4 space-y-2">
+              <span className="block text-xs text-white/45 uppercase font-bold">Active Device Sessions</span>
+              <div className="text-[11px] text-white/60 space-y-1">
+                <p>• Chrome on Windows (Current session) - Mumbai, India</p>
+                <p className="opacity-50">• Safari on iOS iPhone 14 - Pune, India</p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {message && <p className="text-sm text-green-400">{message}</p>}
         {error && <p className="text-sm text-red-400">{error}</p>}

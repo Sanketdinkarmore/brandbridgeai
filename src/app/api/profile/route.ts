@@ -16,7 +16,7 @@ export async function GET() {
     const user = await User.findById(result.auth.userId).select("name email role");
     if (!user?.role) return jsonError("User role not set", 400);
 
-    let profile = await Profile.findOne({ userId: result.auth.userId }).lean();
+    let profile: any = await Profile.findOne({ userId: result.auth.userId }).lean();
     if (!profile) {
       profile = await Profile.create({
         userId: result.auth.userId,
