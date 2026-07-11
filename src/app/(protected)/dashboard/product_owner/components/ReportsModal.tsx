@@ -2,6 +2,7 @@
 
 import { X, FileText, Download, AlertCircle, Check } from "lucide-react";
 import { useState } from "react";
+import { PO_API_BASE } from "../lib/types";
 
 interface ReportsModalProps {
   onClose: () => void;
@@ -19,17 +20,45 @@ export default function ReportsModal({ onClose }: ReportsModalProps) {
     { id: "collaboration", name: "Collaboration History Report" },
   ];
 
-  function triggerDownload() {
+  async function triggerDownload() {
     setDownloading(reportType);
-    setTimeout(() => {
-      // Create and trigger client side download
+    try {
       let csvContent = "";
       if (reportType === "revenue") {
-        csvContent = "Date,Views,Requests,Est Revenue,ROI\n2026-07-01,1500,42,1250,2.1x\n2026-07-02,1800,50,1500,2.4x\n2026-07-03,2100,58,1950,2.8x\n";
+        const res = await fetch(`${PO_API_BASE}/products`);
+        const data = await res.json();
+        const products = data.products ?? [];
+        csvContent = "Product Name,Category,Views,Collaboration Requests,Marketing Budget,Status\n";
+        for (const p of products) {
+          csvContent += `"${p.name || ""}","${p.category || ""}",${p.analytics?.views ?? 0},${p.analytics?.collaborationRequests ?? 0},${p.marketingBudget ?? 0},"${p.status || "draft"}"\n`;
+        }
       } else if (reportType === "campaign") {
-        csvContent = "Campaign,Budget,Status,Participants,Views\nSummer Wear Launch,5000,active,4,12800\nFall Apparel outreach,3500,draft,0,0\n";
+        const res = await fetch("/api/campaigns");
+        const data = await res.json();
+        const campaigns = data.campaigns ?? [];
+        csvContent = "Campaign Title,Budget,Status,Participants Count,Created Date\n";
+        for (const c of campaigns) {
+          csvContent += `"${c.title || ""}",${c.budget ?? 0},"${c.status || "draft"}",${c.participants?.length ?? 0},"${new Date(c.createdAt).toLocaleDateString()}"\n`;
+        }
+      } else if (reportType === "collaboration") {
+        const res = await fetch(`${PO_API_BASE}/collaborations`);
+        const data = await res.json();
+        const collabs = data.collaborations ?? [];
+        csvContent = "Brand Partner,Product,Status,Message,Compatibility Score,Created Date\n";
+        for (const c of collabs) {
+          const partner = c.partnerId?.name || "Brand Partner";
+          const product = c.productId?.name || "N/A";
+          const escapedMsg = (c.message || "").replace(/"/g, '""');
+          csvContent += `"${partner}","${product}","${c.status || "pending"}","${escapedMsg}",${c.compatibilityScore ?? "N/A"},"${new Date(c.createdAt).toLocaleDateString()}"\n`;
+        }
       } else {
-        csvContent = "Item,Count,Metric\nActive Products,2,High\nPending Approvals,3,Medium\n";
+        const res = await fetch(`${PO_API_BASE}/products`);
+        const data = await res.json();
+        const products = data.products ?? [];
+        csvContent = "Product Name,Category,Views,Collaboration Requests,Status\n";
+        for (const p of products) {
+          csvContent += `"${p.name || ""}","${p.category || ""}",${p.analytics?.views ?? 0},${p.analytics?.collaborationRequests ?? 0},"${p.status || "draft"}"\n`;
+        }
       }
 
       const blob = new Blob([csvContent], { type: format === "csv" ? "text/csv" : "application/vnd.ms-excel" });
@@ -40,9 +69,12 @@ export default function ReportsModal({ onClose }: ReportsModalProps) {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
+    } catch (e) {
+      console.error("Failed to generate dynamic reports CSV", e);
+      alert("Failed to export report with real database data.");
+    } finally {
       setDownloading(null);
-    }, 1200);
+    }
   }
 
   return (
