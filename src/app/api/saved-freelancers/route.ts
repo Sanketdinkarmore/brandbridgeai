@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     const saved = await SavedFreelancer.findOneAndUpdate(
       { userId: result.auth.userId, freelancerId },
       { userId: result.auth.userId, freelancerId },
-      { upsert: true, new: true },
+      { upsert: true, returnDocument: 'after' },
     );
     return NextResponse.json({ saved }, { status: 201 });
   } catch (error) {

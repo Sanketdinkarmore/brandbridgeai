@@ -45,6 +45,15 @@ export interface IProfile extends Document {
   budgetRange?: string;
   availabilityStatus?: string;
 
+  // New Hirer Profile Fields
+  accountType?: string;
+  projectBudgetRange?: string;
+  preferredCategories?: string[];
+  paymentVerified?: boolean;
+  totalProjectsPosted?: number;
+  hireSuccessRate?: number;
+  avgRatingGiven?: number;
+
   profileComplete: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -96,6 +105,15 @@ const ProfileSchema = new Schema<IProfile>(
     preferredCollaborationType: String,
     budgetRange: String,
     availabilityStatus: { type: String, default: "Open to offers" },
+
+    // New Hirer Profile Fields
+    accountType: String,
+    projectBudgetRange: String,
+    preferredCategories: [String],
+    paymentVerified: { type: Boolean, default: false },
+    totalProjectsPosted: { type: Number, default: 0 },
+    hireSuccessRate: { type: Number, default: 0 },
+    avgRatingGiven: { type: Number, default: 0 },
 
     profileComplete: { type: Boolean, default: false },
   },

@@ -5,6 +5,7 @@ export interface IHire extends Document {
   hirerId: Types.ObjectId;
   freelancerId: Types.ObjectId;
   campaignId?: Types.ObjectId;
+  projectId?: Types.ObjectId;
   status: HireStatus;
   rate?: number;
   startDate?: Date;
@@ -21,6 +22,7 @@ const HireSchema = new Schema<IHire>(
     hirerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     freelancerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     campaignId: { type: Schema.Types.ObjectId, ref: "Campaign" },
+    projectId: { type: Schema.Types.ObjectId, ref: "Project" },
     status: {
       type: String,
       enum: ["pending", "active", "completed", "cancelled"],

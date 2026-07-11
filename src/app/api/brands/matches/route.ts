@@ -149,7 +149,7 @@ export async function GET(request: Request) {
               estimatedReach: aiResult.estimatedReach,
               matchedAt: new Date(),
             },
-            { upsert: true, new: true }
+            { upsert: true, returnDocument: 'after' }
           );
 
           matchData = {

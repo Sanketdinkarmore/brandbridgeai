@@ -16,13 +16,26 @@ export async function GET() {
     const user = await User.findById(result.auth.userId).select("name email role");
     if (!user?.role) return jsonError("User role not set", 400);
 
-    let profile = await Profile.findOne({ userId: result.auth.userId });
+    let profile = await Profile.findOne({ userId: result.auth.userId }).lean();
     if (!profile) {
       profile = await Profile.create({
         userId: result.auth.userId,
         role: user.role as UserRole,
         socialLinks: {},
       });
+      profile = profile.toObject();
+    }
+
+    if (user.role === "hirer") {
+      const { default: Project } = await import("@/models/Project");
+      const { default: Hire } = await import("@/models/Hire");
+      const totalProjects = await Project.countDocuments({ hirerId: result.auth.userId });
+      const completedHires = await Hire.countDocuments({ hirerId: result.auth.userId, status: "completed" });
+      const totalHires = await Hire.countDocuments({ hirerId: result.auth.userId });
+      
+      profile.totalProjectsPosted = totalProjects;
+      profile.hireSuccessRate = totalProjects > 0 ? Math.round((completedHires / totalProjects) * 100) : 0;
+      profile.avgRatingGiven = 0; // Future enhancement once reviews exist
     }
 
     let freelancerProfile = null;
@@ -70,7 +83,7 @@ export async function PUT(request: Request) {
           role: user.role,
         },
       },
-      { upsert: true, new: true, runValidators: true },
+      { upsert: true, returnDocument: 'after', runValidators: true },
     );
 
     if (user.role === "freelancer") {
@@ -90,7 +103,7 @@ export async function PUT(request: Request) {
             experience: fpData.experience,
           },
         },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: 'after' },
       );
     }
 
@@ -101,6 +114,7 @@ export async function PUT(request: Request) {
 
     return NextResponse.json({ profile, freelancerProfile });
   } catch (error) {
+    console.error("Profile PUT Error:", error);
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }

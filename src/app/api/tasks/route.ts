@@ -66,7 +66,7 @@ export async function PATCH(request: Request) {
     const task = await Task.findOneAndUpdate(
       { _id: id, userId: result.auth.userId },
       { $set: updates },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!task) return jsonError("Task not found", 404);

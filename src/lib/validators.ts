@@ -58,7 +58,7 @@ export const profileSchema = z.object({
   socialLinks: socialLinksSchema,
   targetAudience: z.string().optional(),
   marketingBudget: z.preprocess(
-    (val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : val),
+    (val) => (val === "" || val === null || val === undefined ? undefined : (Number.isNaN(Number(val)) ? undefined : Number(val))),
     z.number().min(0).optional(),
   ),
   hiringPreferences: z.string().optional(),
@@ -68,7 +68,7 @@ export const profileSchema = z.object({
   
   // New Brand Profile Fields
   companySize: z.string().optional(),
-  foundedYear: z.preprocess((val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : Number(val)), z.number().optional()),
+  foundedYear: z.preprocess((val) => (val === "" || val === null || val === undefined ? undefined : (Number.isNaN(Number(val)) ? undefined : Number(val))), z.number().optional()),
   businessType: z.string().optional(),
   isRegisteredBusiness: z.boolean().optional(),
   businessRegistrationNumber: z.string().optional(),
@@ -78,22 +78,31 @@ export const profileSchema = z.object({
   targetGender: z.string().optional(),
   primaryMarket: z.string().optional(),
   socialMediaReach: z.object({
-    instagram: z.preprocess((val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : Number(val)), z.number().optional()),
-    youtube: z.preprocess((val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : Number(val)), z.number().optional()),
-    facebook: z.preprocess((val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : Number(val)), z.number().optional()),
-    tiktok: z.preprocess((val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : Number(val)), z.number().optional()),
+    instagram: z.preprocess((val) => (val === "" || val === null || val === undefined ? undefined : (Number.isNaN(Number(val)) ? undefined : Number(val))), z.number().optional()),
+    youtube: z.preprocess((val) => (val === "" || val === null || val === undefined ? undefined : (Number.isNaN(Number(val)) ? undefined : Number(val))), z.number().optional()),
+    facebook: z.preprocess((val) => (val === "" || val === null || val === undefined ? undefined : (Number.isNaN(Number(val)) ? undefined : Number(val))), z.number().optional()),
+    tiktok: z.preprocess((val) => (val === "" || val === null || val === undefined ? undefined : (Number.isNaN(Number(val)) ? undefined : Number(val))), z.number().optional()),
   }).optional(),
   collaborationLookingFor: z.array(z.string()).optional(),
   preferredCollaborationType: z.string().optional(),
   budgetRange: z.string().optional(),
   availabilityStatus: z.string().optional(),
+
+  // New Hirer Profile Fields
+  accountType: z.string().optional(),
+  projectBudgetRange: z.string().optional(),
+  preferredCategories: z.array(z.string()).optional(),
+  paymentVerified: z.boolean().optional(),
+  totalProjectsPosted: z.number().optional(),
+  hireSuccessRate: z.number().optional(),
+  avgRatingGiven: z.number().optional(),
 });
 
 export const freelancerProfileSchema = z.object({
   skills: z.array(z.string()).optional().default([]),
   categories: z.array(z.string()).optional().default([]),
   hourlyRate: z.preprocess(
-    (val) => (val === "" || val === null || (typeof val === "number" && Number.isNaN(val)) ? undefined : val),
+    (val) => (val === "" || val === null || val === undefined ? undefined : (Number.isNaN(Number(val)) ? undefined : Number(val))),
     z.number().min(0).optional(),
   ),
   availability: z.string().optional(),
@@ -151,9 +160,22 @@ export const campaignSchema = z.object({
   assets: z.array(z.string()).optional(),
 });
 
+export const projectSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  category: z.string().min(1, "Category is required"),
+  budgetType: z.enum(["fixed", "hourly"]),
+  budgetAmount: z.number().min(0, "Budget must be a positive number"),
+  deadline: z.string().or(z.date()),
+  requiredSkills: z.array(z.string()).optional(),
+  attachments: z.array(z.string()).optional(),
+  status: z.enum(["open", "in_progress", "completed", "closed"]).optional(),
+});
+
 export const hireSchema = z.object({
   freelancerId: z.string().min(1),
   campaignId: z.string().optional(),
+  projectId: z.string().optional(),
   rate: z.number().min(0).optional(),
   notes: z.string().optional(),
   endDate: z.string().or(z.date()).optional(),

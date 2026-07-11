@@ -43,7 +43,7 @@ export async function PUT(request: Request, { params }: Params) {
     const campaign = await Campaign.findOneAndUpdate(
       { _id: id, ownerId: result.auth.userId },
       { $set: parsed.data },
-      { new: true },
+      { returnDocument: 'after' },
     );
     if (!campaign) return jsonError("Campaign not found", 404);
     return NextResponse.json({ campaign });

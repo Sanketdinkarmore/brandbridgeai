@@ -35,7 +35,7 @@ export async function PUT(request: Request, { params }: Params) {
     const product = await Product.findOneAndUpdate(
       { _id: id, userId: result.auth.userId },
       { $set: parsed.data },
-      { new: true },
+      { returnDocument: 'after' },
     );
     if (!product) return jsonError("Product not found", 404);
     return NextResponse.json({ product });

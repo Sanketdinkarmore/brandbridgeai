@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     const saved = await SavedMatch.findOneAndUpdate(
       { userId: uid, savedBrandId: targetUid },
       { userId: uid, savedBrandId: targetUid },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     );
 
     return NextResponse.json({ success: true, saved });

@@ -30,6 +30,15 @@ export interface ProfileFormData {
   hourlyRate?: number;
   availability?: string;
   experience?: string;
+  
+  // Hirer Fields
+  accountType?: string;
+  projectBudgetRange?: string;
+  preferredCategories?: string[];
+  paymentVerified?: boolean;
+  totalProjectsPosted?: number;
+  hireSuccessRate?: number;
+  avgRatingGiven?: number;
 }
 
 const EMPTY_INITIAL: ProfileFormData = {};
@@ -95,7 +104,7 @@ export default function ProfileForm({
     }
   }
 
-  function toggleArray(field: "skills" | "categories", value: string) {
+  function toggleArray(field: "skills" | "categories" | "preferredCategories", value: string) {
     const arr = form[field] ?? [];
     update(field, arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
   }
@@ -131,9 +140,25 @@ export default function ProfileForm({
         <h2 className="bb-display text-lg font-medium">Basic Information</h2>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {role === "hirer" && (
+            <div>
+              <label className="mb-1.5 block text-xs text-white/50">Account Type</label>
+              <select
+                className="bb-input w-full rounded-xl px-4 py-2.5 text-sm"
+                value={form.accountType ?? "individual"}
+                onChange={(e) => update("accountType", e.target.value)}
+              >
+                <option value="individual">Individual</option>
+                <option value="business">Business</option>
+              </select>
+            </div>
+          )}
+
           {(role === "brand" || role === "product_owner" || role === "hirer") && (
             <div>
-              <label className="mb-1.5 block text-xs text-white/50">Company Name</label>
+              <label className="mb-1.5 block text-xs text-white/50">
+                {role === "hirer" && form.accountType === "business" ? "Company Name" : role === "hirer" ? "Name" : "Company Name"}
+              </label>
               <input
                 className="bb-input w-full rounded-xl px-4 py-2.5 text-sm"
                 value={form.companyName ?? ""}
@@ -142,14 +167,17 @@ export default function ProfileForm({
               />
             </div>
           )}
-          <div>
-            <label className="mb-1.5 block text-xs text-white/50">Location</label>
-            <input
-              className="bb-input w-full rounded-xl px-4 py-2.5 text-sm"
-              value={form.location ?? ""}
-              onChange={(e) => update("location", e.target.value)}
-            />
-          </div>
+          
+          {(role === "brand" || role === "product_owner" || role === "freelancer") && (
+            <div>
+              <label className="mb-1.5 block text-xs text-white/50">Location</label>
+              <input
+                className="bb-input w-full rounded-xl px-4 py-2.5 text-sm"
+                value={form.location ?? ""}
+                onChange={(e) => update("location", e.target.value)}
+              />
+            </div>
+          )}
         </div>
 
         <div>
@@ -213,14 +241,78 @@ export default function ProfileForm({
         )}
 
         {role === "hirer" && (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-xs text-white/50">Typical Project Budget Range</label>
+              <select
+                className="bb-input w-full rounded-xl px-4 py-2.5 text-sm"
+                value={form.projectBudgetRange ?? ""}
+                onChange={(e) => update("projectBudgetRange", e.target.value)}
+              >
+                <option value="">Select range</option>
+                <option value="under_500">Under $500</option>
+                <option value="500_2k">$500 - $2,000</option>
+                <option value="2k_10k">$2,000 - $10,000</option>
+                <option value="10k_50k">$10,000 - $50,000</option>
+                <option value="50k_plus">$50,000+</option>
+              </select>
+            </div>
+            <div className="flex items-center pt-6">
+              <label className="flex cursor-pointer items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    className="peer sr-only"
+                    checked={form.paymentVerified ?? false}
+                    onChange={(e) => update("paymentVerified", e.target.checked)}
+                  />
+                  <div className="block h-6 w-10 rounded-full bg-white/10 peer-checked:bg-purple-500 transition"></div>
+                  <div className="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition peer-checked:translate-x-4"></div>
+                </div>
+                <div className="text-sm font-medium text-white/90">
+                  Payment Method Verified
+                  <p className="text-[10px] font-normal text-white/40">Shows a trust badge to freelancers</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        )}
+
+        {role === "hirer" && (
           <div>
-            <label className="mb-1.5 block text-xs text-white/50">Hiring Preferences</label>
-            <textarea
-              className="bb-input w-full rounded-xl px-4 py-2.5 text-sm"
-              rows={2}
-              value={form.hiringPreferences ?? ""}
-              onChange={(e) => update("hiringPreferences", e.target.value)}
-            />
+            <label className="mb-2 block text-xs text-white/50">Preferred Freelancer Categories</label>
+            <div className="flex flex-wrap gap-2">
+              {FREELANCER_CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => toggleArray("preferredCategories", cat)}
+                  className={`rounded-full px-3 py-1 text-xs transition ${(form.preferredCategories ?? []).includes(cat) ? "bg-purple-500/25 text-purple-200" : "bg-white/5 text-white/50 hover:bg-white/10"}`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {role === "hirer" && (
+          <div className="mt-6 border-t border-white/10 pt-6">
+            <h3 className="mb-4 text-sm font-medium text-white">Hiring History Stats</h3>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="rounded-xl bg-white/5 p-4 text-center">
+                <p className="text-xs text-white/50 mb-1">Total Projects</p>
+                <p className="text-xl font-semibold text-white">{form.totalProjectsPosted ?? 0}</p>
+              </div>
+              <div className="rounded-xl bg-white/5 p-4 text-center">
+                <p className="text-xs text-white/50 mb-1">Hire Success Rate</p>
+                <p className="text-xl font-semibold text-white">{form.hireSuccessRate ?? 0}%</p>
+              </div>
+              <div className="rounded-xl bg-white/5 p-4 text-center">
+                <p className="text-xs text-white/50 mb-1">Avg Rating Given</p>
+                <p className="text-xl font-semibold text-white">{form.avgRatingGiven ? form.avgRatingGiven.toFixed(1) : "N/A"}</p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -240,41 +332,7 @@ export default function ProfileForm({
         </div>
       </div>
 
-      {(role === "brand" || role === "product_owner" || role === "hirer") && (
-        <div className="bb-glass rounded-2xl p-6 space-y-4">
-          <h2 className="bb-display text-lg font-medium">Enterprise & Verification</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1.5 block text-xs text-white/50">GST Identification Number (GSTIN)</label>
-              <input
-                className="bb-input w-full rounded-xl px-4 py-2.5 text-sm"
-                placeholder="27AAAPB1904H1Z4"
-                defaultValue="27AAAPB1904H1Z4"
-              />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-xs text-white/50">Permanent Account Number (PAN)</label>
-              <input
-                className="bb-input w-full rounded-xl px-4 py-2.5 text-sm"
-                placeholder="AAPCB1289H"
-                defaultValue="AAPCB1289H"
-              />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 border-t border-white/5 pt-4">
-            <div>
-              <span className="block text-xs text-white/40 mb-1">Company Trust Reputation</span>
-              <span className="text-sm font-bold text-green-400">96% Verified Score</span>
-            </div>
-            <div>
-              <span className="block text-xs text-white/40 mb-1">Achievements & Verified Badges</span>
-              <span className="inline-block text-[10px] bg-purple-500/15 text-purple-300 font-semibold px-2 py-0.5 rounded mr-2">Top Partner</span>
-              <span className="inline-block text-[10px] bg-blue-500/15 text-blue-300 font-semibold px-2 py-0.5 rounded">Fast Responder</span>
-            </div>
-          </div>
-        </div>
-      )}
 
       {role === "freelancer" && (
         <div className="bb-glass rounded-2xl p-6 space-y-4">

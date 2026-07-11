@@ -39,6 +39,64 @@ export default function ContextPanel({ conversation, role, onClose }: ContextPan
         {role === "brand" && <BrandContextPanel conversation={conversation} />}
         {role === "freelancer" && <FreelancerContextPanel conversation={conversation} />}
         {role === "product_owner" && <ProductOwnerContextPanel conversation={conversation} />}
+        {role === "hirer" && <HirerContextPanel conversation={conversation} />}
+      </div>
+    </div>
+  );
+}
+
+function HirerContextPanel({ conversation }: { conversation: any }) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h4 className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-3">Context</h4>
+        {conversation.relatedEntityType === "freelancer_hire" && (
+          <div className="bg-[#1A1A1D] p-3 rounded-xl border border-white/5">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-medium">Freelancer Hire</span>
+              <span className="px-2 py-0.5 bg-green-500/20 text-green-500 rounded text-xs">Active</span>
+            </div>
+            <p className="text-gray-400 text-xs mb-3">In progress.</p>
+            <div className="flex flex-col gap-2">
+              <button className="w-full py-2 bg-[#6C5CE7] hover:bg-[#5B4BC4] text-white rounded-lg font-medium transition-colors">
+                Mark as Complete
+              </button>
+              <button className="w-full py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg font-medium transition-colors">
+                View Contract/Brief
+              </button>
+              <button className="w-full py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg font-medium transition-colors border border-green-500/30 text-green-400 hover:text-green-300">
+                Release Payment
+              </button>
+            </div>
+          </div>
+        )}
+        {conversation.relatedEntityType === "project_proposal" && (
+          <div className="bg-[#1A1A1D] p-3 rounded-xl border border-white/5">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-medium">Project Proposal</span>
+              <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-500 rounded text-xs">Reviewing</span>
+            </div>
+            <p className="text-gray-400 text-xs mb-3">Awaiting your response</p>
+            <div className="flex flex-col gap-2">
+              <button className="w-full py-2 bg-[#6C5CE7] hover:bg-[#5B4BC4] text-white rounded-lg font-medium transition-colors">
+                Accept Proposal
+              </button>
+              <button className="w-full py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg font-medium transition-colors">
+                View Project
+              </button>
+            </div>
+          </div>
+        )}
+        {!conversation.relatedEntityType && (
+          <p className="text-gray-500 text-xs">General conversation</p>
+        )}
+      </div>
+
+      <div>
+        <h4 className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-3">Shared Files</h4>
+        <div className="text-gray-500 text-xs text-center py-4 bg-[#1A1A1D] rounded-xl border border-white/5">
+          No files shared yet
+        </div>
       </div>
     </div>
   );

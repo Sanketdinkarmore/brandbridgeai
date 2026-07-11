@@ -66,7 +66,7 @@ export async function PATCH(request: Request) {
     const doc = await DocumentModel.findOneAndUpdate(
       { _id: id, userId: result.auth.userId },
       { $set: updates },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!doc) return jsonError("Document not found", 404);

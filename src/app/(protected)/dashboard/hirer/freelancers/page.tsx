@@ -1,2 +1,5 @@
-import FreelancerMarketplace from "@/components/dashboard/FreelancerMarketplace";
-export default function Page() { return <FreelancerMarketplace role="hirer" />; }
+import FreelancerMarketplace from "@/components/dashboard/hirer/FreelancerMarketplace";
+
+export default function FreelancersPage() {
+  return <FreelancerMarketplace role="hirer" />;
+}

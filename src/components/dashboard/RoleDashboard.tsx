@@ -10,6 +10,7 @@ import {
 import StatCard, { type StatCardConfig } from "@/components/dashboard/StatCard";
 import EmptyState from "@/components/dashboard/EmptyState";
 import BrandDashboard from "@/components/dashboard/brand/BrandDashboard";
+import HirerDashboard from "@/components/dashboard/hirer/HirerDashboard";
 import { Sparkles, Briefcase, FileText, FolderOpen, DollarSign } from "lucide-react";
 import {
   StatCardSkeleton,
@@ -56,6 +57,10 @@ export default function RoleDashboard({ role }: RoleDashboardProps) {
 
   if (role === "freelancer") {
     return <FreelancerDashboard />;
+  }
+
+  if (role === "hirer") {
+    return <HirerDashboard />;
   }
 
   return <GenericRoleDashboard role={role} />;

@@ -62,7 +62,7 @@ export async function PATCH(request: Request) {
     const automation = await Automation.findOneAndUpdate(
       { _id: id, userId: result.auth.userId },
       { $set: updates },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!automation) return jsonError("Automation not found", 404);

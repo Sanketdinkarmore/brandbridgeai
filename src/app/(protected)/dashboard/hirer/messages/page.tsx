@@ -1,2 +1,5 @@
-import MessagesPage from "@/components/dashboard/MessagesPage";
-export default function Page() { return <MessagesPage role="hirer" />; }
+import MessagesCenter from "@/components/messages/MessagesCenter";
+
+export default function MessagesPage() {
+  return <MessagesCenter role="hirer" />;
+}

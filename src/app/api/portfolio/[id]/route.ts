@@ -20,7 +20,7 @@ export async function PUT(request: Request, { params }: Params) {
     const item = await PortfolioItem.findOneAndUpdate(
       { _id: id, userId: result.auth.userId },
       { $set: parsed.data },
-      { new: true },
+      { returnDocument: 'after' },
     );
     if (!item) return jsonError("Portfolio item not found", 404);
     return NextResponse.json({ item });

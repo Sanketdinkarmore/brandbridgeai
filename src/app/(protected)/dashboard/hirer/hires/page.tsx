@@ -1,5 +1,5 @@
-import MyHiresPage from "@/components/dashboard/MyHiresPage";
+import MyHiresPage from "@/components/dashboard/hirer/MyHiresPage";
 
-export default function HirerHiresPage() {
-  return <MyHiresPage viewAs="hirer" />;
+export default function HiresPage() {
+  return <MyHiresPage role="hirer" />;
 }
