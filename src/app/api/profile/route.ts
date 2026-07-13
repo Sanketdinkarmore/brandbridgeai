@@ -32,7 +32,7 @@ export async function GET() {
       const totalProjects = await Project.countDocuments({ hirerId: result.auth.userId });
       const completedHires = await Hire.countDocuments({ hirerId: result.auth.userId, status: "completed" });
       const totalHires = await Hire.countDocuments({ hirerId: result.auth.userId });
-      
+
       profile.totalProjectsPosted = totalProjects;
       profile.hireSuccessRate = totalProjects > 0 ? Math.round((completedHires / totalProjects) * 100) : 0;
       profile.avgRatingGiven = 0; // Future enhancement once reviews exist
