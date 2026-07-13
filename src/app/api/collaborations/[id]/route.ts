@@ -7,6 +7,7 @@ import Collaboration from "@/models/Collaboration";
 import ProductOwnerCollaborationRequest from "@/app/(protected)/dashboard/product_owner/_models/ProductOwnerCollaborationRequest";
 import { logActivity } from "@/lib/activity";
 import User from "@/models/User";
+import { runAutomations } from "@/lib/automations";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -67,6 +68,11 @@ export async function PATCH(request: Request, { params }: Params) {
       `Collaboration request was ${parsed.data!.status}`,
       { entityId: collaboration._id, entityType: "collaboration" }
     );
+
+    if (parsed.data!.status === "accepted") {
+      await runAutomations(result.auth.userId, "collaboration_accepted", { collaborationId: collaboration._id });
+      await runAutomations(notifyId, "collaboration_accepted", { collaborationId: collaboration._id });
+    }
 
     return NextResponse.json({ collaboration });
   } catch (error) {

@@ -79,3 +79,30 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const result = await requireAuth();
+    if ("error" in result) return result.error;
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) return jsonError("Automation ID is required", 400);
+
+    await connectDB();
+    const automation = await Automation.findOneAndDelete({ _id: id, userId: result.auth.userId });
+    
+    if (!automation) return jsonError("Automation not found", 404);
+
+    await logActivity(
+      result.auth.userId,
+      result.auth.email,
+      "automation_deleted",
+      `Deleted automation workflow "${automation.name}"`
+    );
+
+    return NextResponse.json({ message: "Automation deleted" });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+  }
+}

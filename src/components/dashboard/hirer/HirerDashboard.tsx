@@ -167,7 +167,7 @@ export default function HirerDashboard() {
                           <Image src={fp.avatar} alt={fp.name} width={40} height={40} className="rounded-full object-cover w-10 h-10" />
                         ) : (
                           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/20 text-sm font-bold text-purple-300">
-                            {fp.name.charAt(0)}
+                            {(fp.name || "F").charAt(0)}
                           </div>
                         )}
                         <div>

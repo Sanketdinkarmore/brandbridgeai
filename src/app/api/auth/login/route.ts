@@ -6,6 +6,8 @@ import { getPostAuthRedirect, signToken, setAuthCookie } from "@/lib/auth";
 import { zodErrorMessage } from "@/lib/zod-utils";
 import { loginSchema } from "@/lib/validators";
 import { ROLE_LABELS } from "@/lib/roles";
+import Session from "@/models/Session";
+import { UAParser } from "ua-parser-js";
 import fs from "fs";
 import path from "path";
 
@@ -69,14 +71,40 @@ export async function POST(request: Request) {
       );
     }
 
+    if (user.isActive === false) {
+      user.isActive = true;
+      await user.save();
+    }
+
+    const userAgent = request.headers.get("user-agent") || "Unknown Browser";
+    const ip = request.headers.get("x-forwarded-for") || "Unknown IP";
+    const parser = new UAParser(userAgent);
+    const browser = parser.getBrowser().name ? `${parser.getBrowser().name} ${parser.getBrowser().version}` : "Unknown Browser";
+    const os = parser.getOS().name ? `${parser.getOS().name} ${parser.getOS().version}` : "Unknown OS";
+    
+    // Create token identifier to tie this session to the JWT
+    const tokenIdentifier = crypto.randomUUID();
+
     const token = signToken(
       {
         userId: user._id.toString(),
         email: user.email,
         role: user.role ?? undefined,
+        sessionVersion: user.sessionVersion || 0,
+        tokenIdentifier,
       },
       rememberMe,
     );
+
+    await Session.create({
+      userId: user._id,
+      tokenIdentifier,
+      userAgent,
+      ipAddress: ip,
+      device: os,
+      browser,
+      location: "Unknown", // Geolocation mapping typically requires an external API or DB
+    });
 
     const response = NextResponse.json({
       message: "Login successful",

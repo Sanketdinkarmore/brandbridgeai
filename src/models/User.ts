@@ -15,6 +15,18 @@ export interface IUser extends Document {
   role?: UserRole | null;
   onboardingComplete: boolean;
   blockedUsers: Types.ObjectId[];
+  twoFactorSecret?: string;
+  twoFactorEnabled: boolean;
+  notificationPreferences: {
+    newMessages: boolean;
+    statusUpdates: boolean;
+    proposals: boolean;
+    marketing: boolean;
+  };
+  sessionVersion: number;
+  isActive: boolean;
+  pendingEmail?: string;
+  emailVerificationToken?: { token: string; expiresAt: Date };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -52,6 +64,21 @@ const UserSchema = new Schema<IUser>(
     },
     onboardingComplete: { type: Boolean, default: false },
     blockedUsers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    twoFactorSecret: { type: String },
+    twoFactorEnabled: { type: Boolean, default: false },
+    notificationPreferences: {
+      newMessages: { type: Boolean, default: true },
+      statusUpdates: { type: Boolean, default: true },
+      proposals: { type: Boolean, default: true },
+      marketing: { type: Boolean, default: false },
+    },
+    sessionVersion: { type: Number, default: 0 },
+    isActive: { type: Boolean, default: true },
+    pendingEmail: { type: String, lowercase: true, trim: true },
+    emailVerificationToken: {
+      token: String,
+      expiresAt: Date,
+    },
   },
   { timestamps: true },
 );

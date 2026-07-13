@@ -5,6 +5,8 @@ import User from "@/models/User";
 import { getPostAuthRedirect, setAuthCookie, signToken } from "@/lib/auth";
 import { isValidRole, type UserRole } from "@/lib/roles";
 import { getAppUrl, getGoogleRedirectUri } from "@/lib/app-url";
+import { UAParser } from "ua-parser-js";
+import Session from "@/models/Session";
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
@@ -87,10 +89,35 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${appUrl}/signup?error=select_role`);
     }
 
+    if (user.isActive === false) {
+      user.isActive = true;
+      await user.save();
+    }
+
+    const userAgent = request.headers.get("user-agent") || "Unknown Browser";
+    const ip = request.headers.get("x-forwarded-for") || "Unknown IP";
+    const parser = new UAParser(userAgent);
+    const browser = parser.getBrowser().name ? `${parser.getBrowser().name} ${parser.getBrowser().version}` : "Unknown Browser";
+    const os = parser.getOS().name ? `${parser.getOS().name} ${parser.getOS().version}` : "Unknown OS";
+    
+    const tokenIdentifier = crypto.randomUUID();
+
     const token = signToken({
       userId: user._id.toString(),
       email: user.email,
       role: user.role ?? undefined,
+      sessionVersion: user.sessionVersion || 0,
+      tokenIdentifier,
+    });
+
+    await Session.create({
+      userId: user._id,
+      tokenIdentifier,
+      userAgent,
+      ipAddress: ip,
+      device: os,
+      browser,
+      location: "Unknown",
     });
 
     const redirect = getPostAuthRedirect(user.isEmailVerified, user.role);
