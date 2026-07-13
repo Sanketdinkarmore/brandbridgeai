@@ -16,7 +16,7 @@ export async function GET() {
     const user = await User.findById(result.auth.userId).select("name email role");
     if (!user?.role) return jsonError("User role not set", 400);
 
-    let profile = await Profile.findOne({ userId: result.auth.userId }).lean();
+    let profile: any = await Profile.findOne({ userId: result.auth.userId }).lean();
     if (!profile) {
       profile = await Profile.create({
         userId: result.auth.userId,
@@ -32,7 +32,7 @@ export async function GET() {
       const totalProjects = await Project.countDocuments({ hirerId: result.auth.userId });
       const completedHires = await Hire.countDocuments({ hirerId: result.auth.userId, status: "completed" });
       const totalHires = await Hire.countDocuments({ hirerId: result.auth.userId });
-      
+
       profile.totalProjectsPosted = totalProjects;
       profile.hireSuccessRate = totalProjects > 0 ? Math.round((completedHires / totalProjects) * 100) : 0;
       profile.avgRatingGiven = 0; // Future enhancement once reviews exist
