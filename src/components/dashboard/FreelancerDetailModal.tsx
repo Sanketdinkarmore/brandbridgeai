@@ -11,14 +11,14 @@ interface FreelancerDetailModalProps {
 }
 
 export default function FreelancerDetailModal({ freelancer, onClose, onHire, onMessage }: FreelancerDetailModalProps) {
-  const profile = freelancer.profile;
-  const fProfile = freelancer.freelancerProfile;
+  const profile = freelancer.profile as any;
+  const fProfile = freelancer.freelancerProfile as any;
   const rating = fProfile?.rating || 0;
-  
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-0">
       <div className="bg-[#1a1a24] border border-white/10 w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
-        
+
         <div className="flex items-start justify-between p-6 border-b border-white/10 shrink-0">
           <div className="flex items-center gap-4">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-purple-500/20 text-2xl font-semibold text-purple-200">
@@ -108,7 +108,7 @@ export default function FreelancerDetailModal({ freelancer, onClose, onHire, onM
                 </div>
               </div>
             </div>
-            
+
             <div className="pt-4 border-t border-white/10 space-y-3">
               <button onClick={() => { onClose(); onHire(); }} className="w-full bb-btn-primary py-3 rounded-xl text-sm font-medium">
                 Hire Freelancer
