@@ -326,12 +326,9 @@ export default function BrandBridgeLanding() {
       <div style={{ position: "sticky", top: 0, zIndex: 50, padding: scrolled ? "10px 16px 0" : "18px 16px 0", transition: "padding .35s ease" }}>
         <nav className={`bb-nav-bar ${scrolled ? "scrolled" : ""}`} style={{ maxWidth: 1080, margin: "0 auto", display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "space-between", borderRadius: 18, padding: scrolled ? "10px 18px" : "14px 20px" }}>
 
-          <div className="bb-display" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 18, fontWeight: 600 }}>
-            <span style={{ width: 32, height: 32, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,#8b5cf6,#4f8cff)" }}>
-              <Sparkles size={16} color="#fff" />
-            </span>
+          <div className="bb-display" style={{ display: "flex", alignItems: "baseline", gap: 6, fontSize: 24, fontWeight: 900, letterSpacing: "-0.03em" }}>
             <span className="bb-grad-text">BrandBridge</span>
-            <span style={{ fontSize: 13, fontWeight: 400, color: "var(--ink-faint)" }}>AI</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-soft)", letterSpacing: "0.05em" }}>AI</span>
           </div>
 
           <div className="hidden md:flex" style={{ alignItems: "center", gap: 26, fontSize: 14, color: "var(--ink-soft)" }}>
