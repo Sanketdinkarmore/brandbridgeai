@@ -8,7 +8,7 @@ interface PoStatCardProps {
 
 export default function PoStatCard({ label, value, icon: Icon }: PoStatCardProps) {
   return (
-    <div className="bb-glass bb-card rounded-2xl p-5">
+    <div className="bb-glass bb-card rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/10 cursor-default">
       <div
         className="flex h-10 w-10 items-center justify-center rounded-xl"
         style={{ background: "rgba(139,92,246,0.18)" }}

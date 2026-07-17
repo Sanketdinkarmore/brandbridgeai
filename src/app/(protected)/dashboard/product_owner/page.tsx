@@ -264,8 +264,8 @@ export default function ProductOwnerHomePage() {
                         href={`/dashboard/product_owner/products/${item._id}`}
                         className="flex items-center justify-between rounded-xl bg-[var(--surface-strong)] px-4 py-3 text-sm hover:bg-[var(--surface-strong)]"
                       >
-                        <div>
-                          <span className="font-medium">{String(item.name ?? "Product")}</span>
+                        <div className="flex-1 min-w-0 pr-2 truncate">
+                          <span className="font-medium truncate">{String(item.name ?? "Product")}</span>
                           {!!item.category && (
                             <span className="ml-2 text-xs text-ink-faint">{String(item.category)}</span>
                           )}
